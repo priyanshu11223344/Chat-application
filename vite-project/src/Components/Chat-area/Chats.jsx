@@ -8,9 +8,13 @@ import {
 } from "../../redux/chat/chatThunk";
 import {
   addMessage,
-  addGroupMessage
+  addGroupMessage,
+  updateLastPrivateMessage,
+  updateLastGroupMessage
 } from "../../redux/chat/chatSlice";
-
+import { FaSmile,FaPaperPlane } from "react-icons/fa";
+import EmojiPicker from "emoji-picker-react";
+import WhatsAppbg from "../../assets/WhatsAppbg.jpg"
 const ChatArea = () => {
   const dispatch = useDispatch();
   const messagesEndRef = useRef(null);
@@ -23,7 +27,25 @@ const ChatArea = () => {
     groupMessages,
     loading
   } = useSelector((state) => state.chat);
-
+  const [showPicker,setShowPicker]=useState(false);
+  const pickerRef=useRef(null);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (pickerRef.current && !pickerRef.current.contains(event.target)) {
+        setShowPicker(false);
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+  
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  
+  const handleEmojiClick=(emojiData)=>{
+    setMessage(prev=>prev+emojiData.emoji)
+  }
   // 🔥 Decide active messages
   const activeMessages = selectedGroup ? groupMessages : messages;
 
@@ -56,6 +78,7 @@ const ChatArea = () => {
   useEffect(() => {
     socket.on("receiver_message", (data) => {
       dispatch(addMessage(data));
+      dispatch(updateLastPrivateMessage(data))
     });
 
     return () => socket.off("receiver_message");
@@ -65,6 +88,7 @@ const ChatArea = () => {
   useEffect(() => {
     socket.on("receive-group-message", (data) => {
       dispatch(addGroupMessage(data));
+      dispatch(updateLastGroupMessage(data))
     });
 
     return () => socket.off("receive-group-message");
@@ -121,10 +145,12 @@ const ChatArea = () => {
   }
   console.log("active", activeMessages)
   return (
-    <div className="flex flex-col h-full w-full">
+    <div className="flex flex-col h-full w-full"
+    style={{ backgroundImage: `url(${WhatsAppbg})` }}
+    >
 
       {/* CHAT MESSAGES */}
-      <div className="flex-1 overflow-y-auto p-3 bg-gray-600">
+      <div className="flex-1 overflow-y-auto p-3">
         {loading ? (
           <p>Loading chats...</p>
         ) : (
@@ -168,6 +194,12 @@ const ChatArea = () => {
 
       {/* INPUT */}
       <div className="flex gap-2 p-3 border-t shrink-0 bg-gray-800">
+      <div className="flex items-center">
+      <FaSmile size={29}
+        className="cursor-pointer text-xl text-white mx-[8px]"
+        onClick={() => setShowPicker(!showPicker)}
+      />
+      </div>
         <input
           className="flex-1 border rounded-lg px-3 py-2"
           placeholder="Type a message"
@@ -175,13 +207,21 @@ const ChatArea = () => {
           onChange={(e) => setMessage(e.target.value)}
         />
 
-        <button
+        <div className="flex items-center text-white mx-[15px] ">
+        <FaPaperPlane
+        size={22}
           onClick={sendMessage}
-          className="bg-blue-600 text-white px-4 rounded-lg"
+          
         >
           Send
-        </button>
+        </FaPaperPlane>
+        </div>
       </div>
+      {showPicker && (
+        <div ref={pickerRef} className="absolute bottom-14 left-0 z-50">
+          <EmojiPicker onEmojiClick={handleEmojiClick} />
+        </div>
+      )}
     </div>
   );
 };

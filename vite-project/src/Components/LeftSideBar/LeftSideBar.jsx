@@ -7,7 +7,7 @@ import { FaSearch } from "react-icons/fa";
 import { createGroup } from "../../redux/chat/chatThunk";
 import { loadGroups } from "../../redux/chat/chatThunk";
 import { socket } from "../../socket";
-
+import { FaUsers, FaUser } from "react-icons/fa";
 const LeftSideBar = () => {
   const dispatch = useDispatch();
 
@@ -46,7 +46,6 @@ const LeftSideBar = () => {
   lastChats.forEach((chat) => {
     lastMessageMap[chat._id] = chat.lastMessage;
   });
-  const merged=[...groups,...users]
   const filteredUsers = users.filter((u) =>
     u.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -82,18 +81,45 @@ const LeftSideBar = () => {
   return (
     /* ✅✅✅ CHANGE MADE HERE */
     /* Added overflow-y-auto to make whole sidebar scrollable */
-    <div className="h-full flex flex-col overflow-y-auto scroll-smooth">
+    <div className="h-full flex flex-col overflow-y-auto scroll-smooth font-poppins">
       {/* SEARCH */}
-      <div className="flex items-center gap-2 p-3 rounded-xl mx-2 my-2">
-        <FaSearch className="text-gray-300" />
-        <input
-          type="search"
-          className="appearance-none bg-transparent text-black rounded-2xl h-6 px-2 py-1 outline-none w-full"
-          placeholder="Search..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <div className="px-3 pt-3">
+        <div
+          className="
+      flex items-center gap-2
+     
+      px-3 py-1.5
+      rounded-4xl
+     
+      focus-within:border-green-500
+      transition-all duration-200
+      mb-2
+    "
+        >
+          <FaSearch size={22} className="text-gray-400 text-sm" />
+
+          <input
+            type="search"
+            className="
+        bg-black
+        outline-none
+        border-none
+        rounded-3xl
+        focus:ring-0
+        appearance-none
+        text-black
+        placeholder-gray-700
+        w-full
+        text-sm
+      "
+            placeholder="Search chats..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
+
+
 
       {/* CREATE GROUP */}
       <button
@@ -106,7 +132,12 @@ const LeftSideBar = () => {
       {/* GROUPS */}
       {groups.length > 0 && (
         <div className="mt-2">
-          <p className="text-gray-400 text-sm px-4">Groups</p>
+          <div className="flex items-center ">
+            <div>
+              <FaUsers className="text-white mx-[14px] mt-[4px]" size={29} />
+            </div>
+            <div className="text-white text-[20px] px-2 pt-2  ">Groups</div>
+          </div>
 
           {/* ❌ Removed inner scroll container */}
           {filteredGroups.map((group) => (
@@ -133,7 +164,10 @@ const LeftSideBar = () => {
 
       {/* USERS */}
       <div>
-        <div className="text-white mx-[17px] mt-[14px]">Users</div>
+        <div className="flex items-center">
+          <div className="text-white mt-4 ml-5 te"><FaUser /></div>
+          <div className="text-white mx-[17px] mt-[14px] text-xl font-light">Users</div>
+        </div>
 
         {/* ❌ Removed inner scroll container */}
         <ul>
@@ -143,9 +177,8 @@ const LeftSideBar = () => {
                 <li
                   key={user._id}
                   onClick={() => dispatch(setSelectedUser(user))}
-                  className={`text-white p-2 mx-2 my-1 rounded cursor-pointer hover:bg-gray-600 ${
-                    selectedUser?._id === user._id ? "bg-gray-700" : ""
-                  }`}
+                  className={`text-white p-2 mx-2 my-1 rounded cursor-pointer hover:bg-gray-600 ${selectedUser?._id === user._id ? "bg-gray-700" : ""
+                    }`}
                 >
                   <div className="flex gap-3 items-center">
                     <div className="h-7 w-7 bg-gray-500 rounded-full" />
@@ -199,11 +232,10 @@ const LeftSideBar = () => {
                   <div
                     key={user._id}
                     onClick={() => toggleMember(user)}
-                    className={`p-2 rounded cursor-pointer mb-1 ${
-                      members.some((u) => u._id === user._id)
-                        ? "bg-green-200"
-                        : "hover:bg-gray-100"
-                    }`}
+                    className={`p-2 rounded cursor-pointer mb-1 ${members.some((u) => u._id === user._id)
+                      ? "bg-green-200"
+                      : "hover:bg-gray-100"
+                      }`}
                   >
                     {user.name}
                   </div>

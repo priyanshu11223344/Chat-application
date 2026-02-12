@@ -17,6 +17,7 @@ const chatSlice = createSlice({
   reducers: {
     setSelectedUser: (state, action) => {
       state.selectedUser = action.payload;
+      state.selectedGroup=null;
       state.messages = [];
     },
     addMessage: (state, action) => {
@@ -30,11 +31,36 @@ const chatSlice = createSlice({
     },
     setSelectedGroup:(state,action)=>{
      state.selectedGroup=action.payload;
+     state.selectedUser=null;
      state.groupMessages=[];
     },
     addGroupMessage:(state,action)=>{
       state.groupMessages.push(action.payload);
-    }
+    },
+    updateLastPrivateMessage: (state, action) => {
+      const msg = action.payload;
+    
+      const chat = state.lastChats.find(
+        (c) => c._id === msg.sender || c._id === msg.receiver
+      );
+    
+      if (chat) {
+        chat.lastMessage = msg.message;
+      }
+    },
+    updateLastGroupMessage: (state, action) => {
+      const msg = action.payload;
+    
+      const group = state.groups.find(
+        (g) => g._id === msg.groupId
+      );
+    
+      if (group) {
+        group.lastMessage = msg.message;
+      }
+    },
+    
+    
   },
 
   extraReducers: (builder) => {
@@ -94,7 +120,9 @@ export const {
   addMessage,
   resetChat,
   setSelectedGroup,      // ✅ ADD
-  addGroupMessage        // ✅ ADD
+  addGroupMessage  ,
+  updateLastPrivateMessage,
+  updateLastGroupMessage      // ✅ ADD
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
