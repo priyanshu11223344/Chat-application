@@ -9,24 +9,29 @@ const chatSocket = (io) => {
         });
         socket.on("private_message", async ({ from, to, message }) => {
             try {
-                const savedMessages = await Message.create({
+                const savedMessage = await Message.create({
                     sender: from,
                     receiver: to,
                     message: message,
-                })
+                });
+        
+                // 🔥 Emit to receiver
                 const receiverSocket = onlineUsers[to];
                 if (receiverSocket) {
-                    io.to(receiverSocket).emit("receiver_message", savedMessages);
+                    io.to(receiverSocket).emit("receiver_message", savedMessage);
                 }
-                console.log("Sender:", from);
-                console.log("Receiver:", to);
-                console.log("Receiver socket:", onlineUsers[to]);
-
-
+        
+                // 🔥 ALSO emit back to sender
+                const senderSocket = onlineUsers[from];
+                if (senderSocket) {
+                    io.to(senderSocket).emit("receiver_message", savedMessage);
+                }
+        
             } catch (error) {
-                console.error("Error saving message:", error)
+                console.error("Error saving message:", error);
             }
         });
+        
         socket.on("disconnect", () => {
             for (let user in onlineUsers) {
                 if (onlineUsers[user] === socket.id) {
