@@ -197,7 +197,7 @@ const LeftSideBar = () => {
 
       {/* CREATE GROUP MODAL */}
       {showGroupModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 bg-opacity-25 flex items-center justify-center z-50">
           <div className="bg-white w-[400px] rounded-lg p-4">
             <div className="flex justify-between items-center mb-2">
               <h2 className="font-semibold text-lg">Create Group</h2>
